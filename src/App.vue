@@ -1,30 +1,133 @@
 <script setup>
-import HelloWorld from './components/HelloWorld.vue'
+import { useCompanyData } from './composables/useCompanyData'
+import { onMounted, ref } from 'vue';
+
+const { getAllCompany, updateCompany, addCompany, deleteCompany } = useCompanyData();
+
+const isLoading = ref(true);
+
+const newCompanyName = ref('');
+const newOwnerID = ref('');
+
+const allCompanyData = ref([]);
+
+onMounted(()=>{
+  updateCompanyList();
+});
+
+async function updateCompanyList() {
+  allCompanyData.value = await getAllCompany();
+  console.log(allCompanyData.value);
+  isLoading.value = false;
+}
+
+async function onAddCompany(companyName, ownerID) {
+  await addCompany(companyName, ownerID);
+  updateCompanyList();
+}
+
+async function onDeleteCompany(companyID) {
+  await deleteCompany(companyID);
+  updateCompanyList();
+}
+
 </script>
 
 <template>
-  <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <div class="container">
+    <div class="title">公司資料列表</div>
+    <div class="is-loading" v-if="isLoading">讀取中...</div>
+    <div v-else>
+      <ul>
+        <li class="tab-style">
+          <div>公司ID</div>
+          <div>公司名稱</div>
+          <div>創建日期</div>
+          <div>擁有者ID</div>
+          <div>更新按鈕</div>
+          <div>刪除按鈕</div>
+        </li>
+        <li class="tab-style" v-for="item in allCompanyData" :key="item.id">     
+          <span>{{ item.id }}</span>
+          <input type="text" v-model="item.name">
+          <span>{{ item.create_at }}</span>
+          <span>{{ item.owner }}</span>
+          <button @click="updateCompany(item.id, item.name)">更新</button>
+          <button @click="onDeleteCompany(item.id)">刪除</button>
+        </li>
+      </ul>
+    </div>
+    
+    <div class="sub-title">新增資料</div>
+    <span class="input-group">
+      <label>Company Name：</label>
+      <input type="text" v-model="newCompanyName">
+    </span>
+    <span class="input-group">
+      <label>Owner ID：</label>
+      <input type="number" v-model="newOwnerID">
+    </span>
+    <button @click="onAddCompany(newCompanyName, newOwnerID)">新增</button>
   </div>
-  <HelloWorld msg="Vite + Vue" />
+
 </template>
 
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
+  * {
+    box-sizing: border-box;
+    font-family: sans-serif;
+  }
+
+  ul {
+    margin: 0;
+    padding: 0;
+  }
+
+  li {
+    margin: 10px 0;
+  }
+
+  li:first-child {
+    margin: 10px 0 20px 0;
+  }
+
+  .container {
+    max-width: 1200px;
+    padding: 0 15px;
+    margin: 0 auto;
+  }
+
+  .is-loading {
+    margin: 100px 0;
+    text-align: center;
+    font-size: 20pt;
+    font-weight: 600;
+    color: red;
+  }
+
+  .title {
+    margin: 20px 0;
+    font-size: 20pt;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .sub-title{
+    margin: 50px 0 20px 0;
+    font-size: 16pt;
+    font-weight: 600;
+  }
+  
+  .tab-style {
+    display: grid;
+    grid-template-columns: 80px 300px 300px 80px auto auto;
+    justify-items: center;
+    align-items: center;
+    column-gap: 10px;
+  }
+
+  .input-group {
+    padding: 0 20px 0 0;
+  }
+
 </style>
