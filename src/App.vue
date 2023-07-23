@@ -22,11 +22,19 @@ async function updateCompanyList() {
 }
 
 async function onAddCompany(companyName, ownerID) {
+  isLoading.value = true;
   await addCompany(companyName, ownerID);
   updateCompanyList();
 }
 
+async function onUpdateCompany(companyID, companyName) {
+  isLoading.value = true;
+  await updateCompany(companyID, companyName);
+  updateCompanyList();
+}
+
 async function onDeleteCompany(companyID) {
+  isLoading.value = true;
   await deleteCompany(companyID);
   updateCompanyList();
 }
@@ -52,8 +60,8 @@ async function onDeleteCompany(companyID) {
           <input type="text" v-model="item.name">
           <span>{{ item.create_at }}</span>
           <span>{{ item.owner }}</span>
-          <button @click="updateCompany(item.id, item.name)">更新</button>
-          <button @click="onDeleteCompany(item.id)">刪除</button>
+          <button @click="onUpdateCompany(item.id, item.name)" :disabled="isLoading">更新</button>
+          <button @click="onDeleteCompany(item.id)" :disabled="isLoading">刪除</button>
         </li>
       </ul>
     </div>
@@ -67,7 +75,7 @@ async function onDeleteCompany(companyID) {
       <label>Owner ID：</label>
       <input type="number" v-model="newOwnerID">
     </span>
-    <button @click="onAddCompany(newCompanyName, newOwnerID)">新增</button>
+    <button @click="onAddCompany(newCompanyName, newOwnerID)" :disabled="isLoading">新增</button>
   </div>
 
 </template>
@@ -103,6 +111,10 @@ async function onDeleteCompany(companyID) {
     font-size: 20pt;
     font-weight: 600;
     color: red;
+  }
+
+  button:disabled {
+    background-color: #ccc;
   }
 
   .title {
