@@ -16,4 +16,4 @@ pnpm dev
 
 Deploy project with Vercel.
 
-[![Deploy with Vercel](https://vercel.com)](https://vercel.com)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com)
